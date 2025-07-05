@@ -7,47 +7,9 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
   
-  <!-- Tailwind 配置 -->
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            primary: '#165DFF',
-            success: '#00B42A',
-            warning: '#FF7D00',
-            danger: '#F53F3F',
-            dark: '#1D2129',
-          },
-          fontFamily: {
-            inter: ['Inter', 'system-ui', 'sans-serif'],
-          },
-        },
-      }
-    }
-  </script>
-  
-  <style type="text/tailwindcss">
-    @layer utilities {
-      .content-auto {
-        content-visibility: auto;
-      }
-      .scrollbar-hide {
-        -ms-overflow-style: none;
-        scrollbar-width: none;
-      }
-      .scrollbar-hide::-webkit-scrollbar {
-        display: none;
-      }
-      .card-hover {
-        transition: transform 0.3s, box-shadow 0.3s;
-      }
-      .card-hover:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-      }
-    }
-  </style>
+  <!-- 引入公共 Tailwind 配置和样式 -->
+  <script src="common.js"></script>
+  <link rel="stylesheet" href="common.css">
 </head>
 <body class="font-inter bg-gray-50 text-dark min-h-screen flex flex-col">
   <!-- 侧边栏导航 -->
@@ -225,20 +187,19 @@
                 <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">操作</th>
               </tr>
             </thead>
-            <tbody id="fixtureTableBody" class="bg-white divide-y divide-gray-200">
+            <tbody id="fixtureTableBody">
               <!-- 表格内容将通过JavaScript动态生成 -->
               <tr class="text-center">
                 <td colspan="9" class="px-6 py-10 text-gray-500">
                   <i class="fa fa-spinner fa-spin text-xl mb-2"></i>
-                  <p>加载治具数据中...</p>
+                  <p>正在加载数据...</p>
                 </td>
               </tr>
             </tbody>
           </table>
         </div>
         
-        <!-- 分页控件 -->
-        <div class="px-6 py-4 bg-gray-50 border-t border-gray-200 flex items-center justify-between">
+        <div class="p-4 border-t border-gray-200 flex justify-between items-center">
           <div class="text-sm text-gray-500">
             显示 <span id="showingRange">1-10</span> 条，共 <span id="totalCount">0</span> 条
           </div>
@@ -267,13 +228,10 @@
           </div>
           <div class="flex space-x-6">
             <a href="#" class="text-gray-500 hover:text-gray-700">
-              <i class="fa fa-question-circle"></i> 帮助中心
+              关于我们
             </a>
             <a href="#" class="text-gray-500 hover:text-gray-700">
-              <i class="fa fa-file-text-o"></i> 文档
-            </a>
-            <a href="#" class="text-gray-500 hover:text-gray-700">
-              <i class="fa fa-phone"></i> 联系我们
+              联系我们
             </a>
           </div>
         </div>
@@ -281,93 +239,38 @@
     </footer>
   </div>
 
-  <!-- 新增/编辑治具模态框 -->
-  <div id="fixtureModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300">
-    <div id="modalContent" class="bg-white rounded-xl shadow-xl w-full max-w-md mx-4 transform scale-95 transition-transform duration-300">
-      <div class="p-5 border-b border-gray-200 flex items-center justify-between">
-        <h3 id="modalTitle" class="font-semibold text-lg">新增治具</h3>
-        <button id="closeModal" class="text-gray-400 hover:text-gray-600 transition-colors">
-          <i class="fa fa-times"></i>
-        </button>
-      </div>
-      
-      <div class="p-5">
-        <form id="fixtureForm" class="space-y-4">
-          <div>
-            <label for="fixtureId" class="block text-sm font-medium text-gray-700 mb-1">治具编号</label>
-            <input type="text" id="fixtureId" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30" placeholder="自动生成" readonly>
-          </div>
-          
-          <div>
-            <label for="fixtureType" class="block text-sm font-medium text-gray-700 mb-1">治具类型 <span class="text-danger">*</span></label>
-            <select id="fixtureType" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30" required>
-              <option value="">请选择类型</option>
-              <option value="注塑模具">注塑模具</option>
-              <option value="冲压模具">冲压模具</option>
-              <option value="压铸模具">压铸模具</option>
-              <option value="锻造模具">锻造模具</option>
-              <option value="挤出模具">挤出模具</option>
-              <option value="其他">其他</option>
-            </select>
-          </div>
-          
-          <div>
-            <label for="fixtureCapacity" class="block text-sm font-medium text-gray-700 mb-1">固定产能 (件/月) <span class="text-danger">*</span></label>
-            <input type="number" id="fixtureCapacity" min="1" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30" placeholder="例如: 20000" required>
-          </div>
-          
-          <div>
-            <label for="fixtureSchedule" class="block text-sm font-medium text-gray-700 mb-1">当前排程量 (件) <span class="text-danger">*</span></label>
-            <input type="number" id="fixtureSchedule" min="0" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30" placeholder="例如: 18500" required>
-          </div>
-          
-          <div>
-            <label for="fixtureLocation" class="block text-sm font-medium text-gray-700 mb-1">存放位置</label>
-            <input type="text" id="fixtureLocation" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30" placeholder="例如: A区-01货架">
-          </div>
-          
-          <div>
-            <label for="fixtureDescription" class="block text-sm font-medium text-gray-700 mb-1">治具描述</label>
-            <textarea id="fixtureDescription" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30" placeholder="描述治具的用途、规格等信息"></textarea>
-          </div>
-          
-          <div class="pt-2">
-            <div class="flex space-x-3">
-              <button type="button" id="cancelModal" class="flex-1 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">取消</button>
-              <button type="submit" class="flex-1 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors">保存</button>
-            </div>
-          </div>
-        </form>
-      </div>
-    </div>
-  </div>
-
-  <!-- 批量操作确认模态框 -->
-  <div id="batchActionModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300">
-    <div class="bg-white rounded-xl shadow-xl w-full max-w-md mx-4 transform scale-95 transition-transform duration-300">
-      <div class="p-5 border-b border-gray-200">
-        <h3 class="font-semibold text-lg" id="batchActionTitle">批量删除确认</h3>
-      </div>
-      
-      <div class="p-5">
-        <p id="batchActionMessage" class="text-gray-600 mb-5">
-          确定要删除选中的 <span id="selectedCount">0</span> 个治具吗？此操作不可撤销。
-        </p>
-        
-        <div class="flex space-x-3">
-          <button id="cancelBatchAction" class="flex-1 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">取消</button>
-          <button id="confirmBatchAction" class="flex-1 py-2 bg-danger text-white rounded-lg hover:bg-danger/90 transition-colors">确认</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- 提示消息组件 -->
   <div id="toast" class="fixed bottom-6 right-6 bg-dark text-white px-4 py-3 rounded-lg shadow-lg transform translate-y-20 opacity-0 transition-all duration-300 flex items-center z-50">
     <i id="toastIcon" class="fa fa-check-circle mr-2"></i>
     <span id="toastMessage">操作成功</span>
   </div>
 
   <script src="jig-management.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // 侧边栏控制
+      document.getElementById('openSidebar').addEventListener('click', () => {
+        document.getElementById('sidebar').classList.remove('-translate-x-full');
+      });
+      
+      document.getElementById('closeSidebar').addEventListener('click', () => {
+        document.getElementById('sidebar').classList.add('-translate-x-full');
+      });
+      
+      // 用户菜单控制
+      document.getElementById('userMenuButton').addEventListener('click', () => {
+        const menu = document.getElementById('userMenu');
+        menu.classList.toggle('hidden');
+      });
+      
+      document.addEventListener('click', (event) => {
+        const menuButton = document.getElementById('userMenuButton');
+        const menu = document.getElementById('userMenu');
+        
+        if (!menuButton.contains(event.target) && !menu.contains(event.target)) {
+          menu.classList.add('hidden');
+        }
+      });
+    });
+  </script>
 </body>
 </html>

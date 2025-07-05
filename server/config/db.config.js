@@ -16,7 +16,7 @@ module.exports = {
       user: process.env.DB_USER || 'root',
       password: process.env.DB_PASSWORD || '',
       database: process.env.DB_DATABASE || 'jig_monitoring',
-      port: process.env.DB_PORT || 3306,
+      port: process.env.DB_PORT || 3000,
       connectionLimit: 10,
       waitForConnections: true,
       charset: 'utf8mb4'
