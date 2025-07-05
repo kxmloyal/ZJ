@@ -7,7 +7,7 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
   
-  <!-- 引入公共 Tailwind 配置和样式 -->
+  <!-- 引入公共配置和样式 -->
   <script src="common.js"></script>
   <link rel="stylesheet" href="common.css">
 </head>
@@ -239,6 +239,121 @@
     </footer>
   </div>
 
+  <!-- 新增/编辑治具模态框 -->
+  <div id="fixtureModal" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center hidden">
+    <div class="bg-white rounded-xl shadow-xl w-full max-w-lg mx-4 transform transition-all">
+      <div class="p-5 border-b border-gray-200 flex justify-between items-center">
+        <h3 id="fixtureModalTitle" class="text-lg font-semibold">新增治具</h3>
+        <button id="closeFixtureModal" class="text-gray-400 hover:text-gray-600">
+          <i class="fa fa-times"></i>
+        </button>
+      </div>
+      
+      <form id="fixtureForm" class="p-5">
+        <input type="hidden" id="fixtureId">
+        
+        <div class="mb-4">
+          <label for="fixtureCode" class="block text-sm font-medium text-gray-700 mb-1">治具编号 <span class="text-danger">*</span></label>
+          <input type="text" id="fixtureCode" name="code" required 
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30">
+          <p id="codeError" class="text-danger text-xs mt-1 hidden error-message"></p>
+        </div>
+        
+        <div class="mb-4">
+          <label for="fixtureType" class="block text-sm font-medium text-gray-700 mb-1">治具类型 <span class="text-danger">*</span></label>
+          <select id="fixtureType" name="type" required 
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30">
+            <option value="">请选择类型</option>
+            <option value="注塑模具">注塑模具</option>
+            <option value="冲压模具">冲压模具</option>
+            <option value="压铸模具">压铸模具</option>
+            <option value="锻造模具">锻造模具</option>
+            <option value="挤出模具">挤出模具</option>
+            <option value="其他">其他</option>
+          </select>
+          <p id="typeError" class="text-danger text-xs mt-1 hidden error-message"></p>
+        </div>
+        
+        <div class="mb-4">
+          <label for="fixtureCapacity" class="block text-sm font-medium text-gray-700 mb-1">固定产能(件/月) <span class="text-danger">*</span></label>
+          <input type="number" id="fixtureCapacity" name="capacity" required min="1" 
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30">
+          <p id="capacityError" class="text-danger text-xs mt-1 hidden error-message"></p>
+        </div>
+        
+        <div class="mb-4">
+          <label for="fixtureScheduled" class="block text-sm font-medium text-gray-700 mb-1">当前排程(件)</label>
+          <input type="number" id="fixtureScheduled" name="scheduled" min="0" 
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30">
+          <p id="scheduledError" class="text-danger text-xs mt-1 hidden error-message"></p>
+        </div>
+        
+        <div class="mb-5">
+          <label for="fixtureDescription" class="block text-sm font-medium text-gray-700 mb-1">备注说明</label>
+          <textarea id="fixtureDescription" name="description" rows="3" 
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30"></textarea>
+        </div>
+        
+        <div class="flex justify-end space-x-3">
+          <button type="button" id="cancelFixtureModal" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+            取消
+          </button>
+          <button type="submit" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors">
+            保存治具
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 批量导入模态框 -->
+  <div id="batchImportModal" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center hidden">
+    <div class="bg-white rounded-xl shadow-xl w-full max-w-lg mx-4 transform transition-all">
+      <div class="p-5 border-b border-gray-200 flex justify-between items-center">
+        <h3 class="text-lg font-semibold">批量导入治具</h3>
+        <button id="closeBatchImportModal" class="text-gray-400 hover:text-gray-600">
+          <i class="fa fa-times"></i>
+        </button>
+      </div>
+      
+      <div class="p-5">
+        <div class="mb-4">
+          <p class="text-sm text-gray-500 mb-3">
+            请上传JSON格式的治具数据文件，支持批量导入治具信息。
+            <a href="#" class="text-primary hover:underline">下载模板</a>
+          </p>
+          
+          <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-primary transition-colors">
+            <i class="fa fa-cloud-upload text-3xl text-gray-400 mb-3"></i>
+            <p class="mb-3 text-sm text-gray-500">拖拽文件到此处或点击上传</p>
+            <input type="file" id="importFile" accept=".json" class="hidden">
+            <button id="browseImportFile" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors">
+              选择文件
+            </button>
+          </div>
+          <p id="importFileError" class="text-danger text-xs mt-2 hidden error-message"></p>
+        </div>
+        
+        <div id="importPreview" class="mb-4 hidden">
+          <h4 class="font-medium text-sm mb-2">预览数据</h4>
+          <div class="border border-gray-200 rounded-lg max-h-40 overflow-y-auto p-3 text-sm">
+            <pre id="importDataPreview" class="text-gray-700"></pre>
+          </div>
+        </div>
+        
+        <div class="flex justify-end space-x-3">
+          <button id="cancelBatchImport" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+            取消
+          </button>
+          <button id="confirmBatchImport" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors">
+            确认导入
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 提示消息组件 -->
   <div id="toast" class="fixed bottom-6 right-6 bg-dark text-white px-4 py-3 rounded-lg shadow-lg transform translate-y-20 opacity-0 transition-all duration-300 flex items-center z-50">
     <i id="toastIcon" class="fa fa-check-circle mr-2"></i>
     <span id="toastMessage">操作成功</span>
@@ -270,6 +385,81 @@
           menu.classList.add('hidden');
         }
       });
+      
+      // 模态框控制
+      document.getElementById('addFixtureBtn').addEventListener('click', () => {
+        document.getElementById('fixtureModal').classList.remove('hidden');
+        document.getElementById('fixtureModalTitle').textContent = '新增治具';
+        document.getElementById('fixtureForm').reset();
+        document.getElementById('fixtureId').value = '';
+        clearFormErrors();
+      });
+      
+      const closeFixtureModal = () => {
+        document.getElementById('fixtureModal').classList.add('hidden');
+        clearFormErrors();
+      };
+      
+      document.getElementById('closeFixtureModal').addEventListener('click', closeFixtureModal);
+      document.getElementById('cancelFixtureModal').addEventListener('click', closeFixtureModal);
+      
+      // 批量导入模态框控制
+      document.getElementById('batchImportBtn').addEventListener('click', () => {
+        document.getElementById('batchImportModal').classList.remove('hidden');
+        document.getElementById('importFile').value = '';
+        document.getElementById('importPreview').classList.add('hidden');
+        document.getElementById('importFileError').classList.add('hidden');
+      });
+      
+      const closeBatchImportModal = () => {
+        document.getElementById('batchImportModal').classList.add('hidden');
+      };
+      
+      document.getElementById('closeBatchImportModal').addEventListener('click', closeBatchImportModal);
+      document.getElementById('cancelBatchImport').addEventListener('click', closeBatchImportModal);
+      
+      // 导入文件选择
+      document.getElementById('browseImportFile').addEventListener('click', () => {
+        document.getElementById('importFile').click();
+      });
+      
+      document.getElementById('importFile').addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+          if (file.type !== 'application/json' && !file.name.endsWith('.json')) {
+            document.getElementById('importFileError').textContent = '请上传JSON格式的文件';
+            document.getElementById('importFileError').classList.remove('hidden');
+            return;
+          }
+          
+          const reader = new FileReader();
+          reader.onload = (event) => {
+            try {
+              const data = JSON.parse(event.target.result);
+              if (Array.isArray(data)) {
+                document.getElementById('importDataPreview').textContent = JSON.stringify(data.slice(0, 3), null, 2) + 
+                  (data.length > 3 ? '\n... 更多数据' : '');
+                document.getElementById('importPreview').classList.remove('hidden');
+                document.getElementById('importFileError').classList.add('hidden');
+              } else {
+                throw new Error('文件内容必须是JSON数组');
+              }
+            } catch (error) {
+              document.getElementById('importFileError').textContent = '文件格式错误: ' + error.message;
+              document.getElementById('importFileError').classList.remove('hidden');
+            }
+          };
+          reader.readAsText(file);
+        }
+      });
+      
+      // 清除表单错误
+      window.clearFormErrors = () => {
+        document.querySelectorAll('.error-message').forEach(el => {
+          el.textContent = '';
+          el.classList.add('hidden');
+        });
+      };
     });
   </script>
 </body>
