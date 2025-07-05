@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>治具产能监控系统 - 治具管理</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+  
+  <!-- Tailwind 配置 -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#165DFF',
+            success: '#00B42A',
+            warning: '#FF7D00',
+            danger: '#F53F3F',
+            dark: '#1D2129',
+          },
+          fontFamily: {
+            inter: ['Inter', 'system-ui', 'sans-serif'],
+          },
+        },
+      }
+    }
+  </script>
+  
+  <style type="text/tailwindcss">
+    @layer utilities {
+      .content-auto {
+        content-visibility: auto;
+      }
+      .scrollbar-hide {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+      }
+      .scrollbar-hide::-webkit-scrollbar {
+        display: none;
+      }
+      .card-hover {
+        transition: transform 0.3s, box-shadow 0.3s;
+      }
+      .card-hover:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      }
+    }
+  </style>
+</head>
+<body class="font-inter bg-gray-50 text-dark min-h-screen flex flex-col">
+  <!-- 侧边栏导航 -->
+  <div class="fixed inset-y-0 left-0 z-40 w-64 bg-white shadow-md transform transition-transform duration-300 ease-in-out md:translate-x-0 -translate-x-full" id="sidebar">
+    <div class="flex h-16 items-center justify-between border-b border-gray-200 px-4">
+      <div class="flex items-center">
+        <i class="fa fa-industry text-primary text-2xl mr-3"></i>
+        <h1 class="text-lg font-semibold">治具产能监控系统</h1>
+      </div>
+      <button type="button" class="text-gray-400 hover:text-gray-600 md:hidden" id="closeSidebar">
+        <i class="fa fa-times"></i>
+      </button>
+    </div>
+    
+    <div class="h-full overflow-y-auto scrollbar-hide py-4">
+      <nav class="px-4 space-y-1">
+        <a href="index.html" class="flex items-center px-3 py-2 text-base font-medium rounded-lg text-gray-600 hover:bg-gray-100">
+          <i class="fa fa-dashboard w-5 h-5 mr-3"></i>
+          仪表盘
+        </a>
+        <a href="jig-management.html" class="flex items-center px-3 py-2 text-base font-medium rounded-lg bg-primary/10 text-primary">
+          <i class="fa fa-cogs w-5 h-5 mr-3"></i>
+          治具管理
+        </a>
+        <a href="#" class="flex items-center px-3 py-2 text-base font-medium rounded-lg text-gray-600 hover:bg-gray-100">
+          <i class="fa fa-calendar w-5 h-5 mr-3"></i>
+          排程计划
+        </a>
+        <a href="#" class="flex items-center px-3 py-2 text-base font-medium rounded-lg text-gray-600 hover:bg-gray-100">
+          <i class="fa fa-bell w-5 h-5 mr-3"></i>
+          警报历史
+        </a>
+        <a href="#" class="flex items-center px-3 py-2 text-base font-medium rounded-lg text-gray-600 hover:bg-gray-100">
+          <i class="fa fa-cog w-5 h-5 mr-3"></i>
+          系统设置
+        </a>
+      </nav>
+    </div>
+  </div>
+
+  <!-- 主内容区 -->
+  <div class="flex-1 md:ml-64 transition-all duration-300">
+    <!-- 顶部导航栏 -->
+    <header class="bg-white shadow-sm sticky top-0 z-30">
+      <div class="flex items-center justify-between h-16 px-4">
+        <div class="flex items-center">
+          <button type="button" class="text-gray-500 hover:text-gray-600 md:hidden" id="openSidebar">
+            <i class="fa fa-bars"></i>
+          </button>
+          <div class="ml-4 md:ml-0">
+            <h2 class="text-lg font-semibold">治具管理</h2>
+          </div>
+        </div>
+        
+        <div class="flex items-center space-x-4">
+          <button class="relative p-2 text-gray-500 hover:text-gray-600">
+            <i class="fa fa-bell"></i>
+            <span class="absolute top-0 right-0 inline-flex items-center justify-center w-4 h-4 text-xs font-bold text-white bg-danger rounded-full">3</span>
+          </button>
+          
+          <div class="relative">
+            <button class="flex items-center space-x-2 focus:outline-none" id="userMenuButton">
+              <img class="h-8 w-8 rounded-full object-cover" src="https://picsum.photos/200/200?random=1" alt="用户头像">
+              <span class="text-sm font-medium">管理员</span>
+              <i class="fa fa-chevron-down text-xs text-gray-400"></i>
+            </button>
+            
+            <div class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-1 hidden z-50" id="userMenu">
+              <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                <i class="fa fa-user mr-2"></i> 个人资料
+              </a>
+              <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                <i class="fa fa-cog mr-2"></i> 设置
+              </a>
+              <div class="border-t border-gray-100 my-1"></div>
+              <a href="#" class="block px-4 py-2 text-sm text-danger hover:bg-gray-100">
+                <i class="fa fa-sign-out mr-2"></i> 退出登录
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- 内容区域 -->
+    <main class="container mx-auto px-4 py-6">
+      <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+        <div>
+          <h1 class="text-2xl font-bold">治具管理</h1>
+          <p class="text-gray-500 mt-1">管理所有治具的基本信息和产能数据</p>
+        </div>
+        
+        <div class="flex flex-wrap gap-3 mt-4 md:mt-0">
+          <div class="relative">
+            <input type="text" id="searchInput" placeholder="搜索治具编号/类型..." 
+              class="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30">
+            <i class="fa fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+          </div>
+          
+          <button id="batchImportBtn" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors flex items-center">
+            <i class="fa fa-upload mr-2"></i> 批量导入
+          </button>
+          
+          <button id="batchExportBtn" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors flex items-center">
+            <i class="fa fa-download mr-2"></i> 批量导出
+          </button>
+          
+          <button id="addFixtureBtn" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors flex items-center">
+            <i class="fa fa-plus mr-2"></i> 新增治具
+          </button>
+        </div>
+      </div>
+      
+      <!-- 筛选工具栏 -->
+      <div class="bg-white rounded-xl shadow-sm p-4 mb-6 card-hover">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">治具类型</label>
+            <select id="typeFilter" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30">
+              <option value="">全部类型</option>
+              <option value="注塑模具">注塑模具</option>
+              <option value="冲压模具">冲压模具</option>
+              <option value="压铸模具">压铸模具</option>
+              <option value="锻造模具">锻造模具</option>
+              <option value="挤出模具">挤出模具</option>
+              <option value="其他">其他</option>
+            </select>
+          </div>
+          
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">状态</label>
+            <select id="statusFilter" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30">
+              <option value="">全部状态</option>
+              <option value="normal">正常</option>
+              <option value="warning">接近超量</option>
+              <option value="over">超量</option>
+            </select>
+          </div>
+          
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">产能范围</label>
+            <select id="capacityFilter" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30">
+              <option value="">全部范围</option>
+              <option value="0-10000">10000以下</option>
+              <option value="10000-20000">10000-20000</option>
+              <option value="20000-30000">20000-30000</option>
+              <option value="30000+">30000以上</option>
+            </select>
+          </div>
+          
+          <div class="flex items-end">
+            <button id="resetFilterBtn" class="w-full px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+              重置筛选
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 治具列表表格 -->
+      <div class="bg-white rounded-xl shadow-sm overflow-hidden card-hover">
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+              <tr>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <input type="checkbox" id="selectAll" class="h-4 w-4 text-primary focus:ring-primary/30 border-gray-300 rounded">
+                </th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">治具编号</th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">类型</th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">固定产能(件/月)</th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">当前排程(件)</th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">利用率</th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">状态</th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">更新时间</th>
+                <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">操作</th>
+              </tr>
+            </thead>
+            <tbody id="fixtureTableBody" class="bg-white divide-y divide-gray-200">
+              <!-- 表格内容将通过JavaScript动态生成 -->
+              <tr class="text-center">
+                <td colspan="9" class="px-6 py-10 text-gray-500">
+                  <i class="fa fa-spinner fa-spin text-xl mb-2"></i>
+                  <p>加载治具数据中...</p>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        
+        <!-- 分页控件 -->
+        <div class="px-6 py-4 bg-gray-50 border-t border-gray-200 flex items-center justify-between">
+          <div class="text-sm text-gray-500">
+            显示 <span id="showingRange">1-10</span> 条，共 <span id="totalCount">0</span> 条
+          </div>
+          
+          <div class="flex space-x-1">
+            <button id="prevPage" class="px-3 py-1 text-sm bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors disabled:opacity-50" disabled>
+              <i class="fa fa-chevron-left"></i>
+            </button>
+            <button class="px-3 py-1 text-sm bg-primary text-white rounded-lg transition-colors">1</button>
+            <button class="px-3 py-1 text-sm bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors">2</button>
+            <button class="px-3 py-1 text-sm bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors">3</button>
+            <button id="nextPage" class="px-3 py-1 text-sm bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors">
+              <i class="fa fa-chevron-right"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="bg-white border-t border-gray-200 py-6 mt-6">
+      <div class="container mx-auto px-4">
+        <div class="flex flex-col md:flex-row justify-between items-center">
+          <div class="text-gray-500 text-sm mb-4 md:mb-0">
+            © 2025 治具产能监控系统. 保留所有权利.
+          </div>
+          <div class="flex space-x-6">
+            <a href="#" class="text-gray-500 hover:text-gray-700">
+              <i class="fa fa-question-circle"></i> 帮助中心
+            </a>
+            <a href="#" class="text-gray-500 hover:text-gray-700">
+              <i class="fa fa-file-text-o"></i> 文档
+            </a>
+            <a href="#" class="text-gray-500 hover:text-gray-700">
+              <i class="fa fa-phone"></i> 联系我们
+            </a>
+          </div>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <!-- 新增/编辑治具模态框 -->
+  <div id="fixtureModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300">
+    <div id="modalContent" class="bg-white rounded-xl shadow-xl w-full max-w-md mx-4 transform scale-95 transition-transform duration-300">
+      <div class="p-5 border-b border-gray-200 flex items-center justify-between">
+        <h3 id="modalTitle" class="font-semibold text-lg">新增治具</h3>
+        <button id="closeModal" class="text-gray-400 hover:text-gray-600 transition-colors">
+          <i class="fa fa-times"></i>
+        </button>
+      </div>
+      
+      <div class="p-5">
+        <form id="fixtureForm" class="space-y-4">
+          <div>
+            <label for="fixtureId" class="block text-sm font-medium text-gray-700 mb-1">治具编号</label>
+            <input type="text" id="fixtureId" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30" placeholder="自动生成" readonly>
+          </div>
+          
+          <div>
+            <label for="fixtureType" class="block text-sm font-medium text-gray-700 mb-1">治具类型 <span class="text-danger">*</span></label>
+            <select id="fixtureType" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30" required>
+              <option value="">请选择类型</option>
+              <option value="注塑模具">注塑模具</option>
+              <option value="冲压模具">冲压模具</option>
+              <option value="压铸模具">压铸模具</option>
+              <option value="锻造模具">锻造模具</option>
+              <option value="挤出模具">挤出模具</option>
+              <option value="其他">其他</option>
+            </select>
+          </div>
+          
+          <div>
+            <label for="fixtureCapacity" class="block text-sm font-medium text-gray-700 mb-1">固定产能 (件/月) <span class="text-danger">*</span></label>
+            <input type="number" id="fixtureCapacity" min="1" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30" placeholder="例如: 20000" required>
+          </div>
+          
+          <div>
+            <label for="fixtureSchedule" class="block text-sm font-medium text-gray-700 mb-1">当前排程量 (件) <span class="text-danger">*</span></label>
+            <input type="number" id="fixtureSchedule" min="0" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30" placeholder="例如: 18500" required>
+          </div>
+          
+          <div>
+            <label for="fixtureLocation" class="block text-sm font-medium text-gray-700 mb-1">存放位置</label>
+            <input type="text" id="fixtureLocation" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30" placeholder="例如: A区-01货架">
+          </div>
+          
+          <div>
+            <label for="fixtureDescription" class="block text-sm font-medium text-gray-700 mb-1">治具描述</label>
+            <textarea id="fixtureDescription" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30" placeholder="描述治具的用途、规格等信息"></textarea>
+          </div>
+          
+          <div class="pt-2">
+            <div class="flex space-x-3">
+              <button type="button" id="cancelModal" class="flex-1 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">取消</button>
+              <button type="submit" class="flex-1 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors">保存</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- 批量操作确认模态框 -->
+  <div id="batchActionModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300">
+    <div class="bg-white rounded-xl shadow-xl w-full max-w-md mx-4 transform scale-95 transition-transform duration-300">
+      <div class="p-5 border-b border-gray-200">
+        <h3 class="font-semibold text-lg" id="batchActionTitle">批量删除确认</h3>
+      </div>
+      
+      <div class="p-5">
+        <p id="batchActionMessage" class="text-gray-600 mb-5">
+          确定要删除选中的 <span id="selectedCount">0</span> 个治具吗？此操作不可撤销。
+        </p>
+        
+        <div class="flex space-x-3">
+          <button id="cancelBatchAction" class="flex-1 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">取消</button>
+          <button id="confirmBatchAction" class="flex-1 py-2 bg-danger text-white rounded-lg hover:bg-danger/90 transition-colors">确认</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 提示消息组件 -->
+  <div id="toast" class="fixed bottom-6 right-6 bg-dark text-white px-4 py-3 rounded-lg shadow-lg transform translate-y-20 opacity-0 transition-all duration-300 flex items-center z-50">
+    <i id="toastIcon" class="fa fa-check-circle mr-2"></i>
+    <span id="toastMessage">操作成功</span>
+  </div>
+
+  <script src="jig-management.js"></script>
+</body>
+</html>
