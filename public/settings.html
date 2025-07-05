@@ -1,0 +1,180 @@
+<!-- ZJ/public/settings.html -->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>治具产能监控系统 - 设置</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+  
+  <!-- Tailwind 配置 -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#165DFF',
+            success: '#00B42A',
+            warning: '#FF7D00',
+            danger: '#F53F3F',
+            dark: '#1D2129',
+          },
+          fontFamily: {
+            inter: ['Inter', 'system-ui', 'sans-serif'],
+          },
+        },
+      }
+    }
+  </script>
+  
+  <style type="text/tailwindcss">
+    @layer utilities {
+      .content-auto {
+        content-visibility: auto;
+      }
+      .scrollbar-hide {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+      }
+      .scrollbar-hide::-webkit-scrollbar {
+        display: none;
+      }
+      .card-hover {
+        transition: transform 0.3s, box-shadow 0.3s;
+      }
+      .card-hover:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      }
+    }
+  </style>
+</head>
+<body class="font-inter bg-gray-50 text-dark min-h-screen flex flex-col">
+  <!-- 侧边栏导航 -->
+  <div class="fixed inset-y-0 left-0 z-40 w-64 bg-white shadow-md transform transition-transform duration-300 ease-in-out md:translate-x-0 -translate-x-full" id="sidebar">
+    <div class="flex h-16 items-center justify-between border-b border-gray-200 px-4">
+      <div class="flex items-center">
+        <i class="fa fa-industry text-primary text-2xl mr-3"></i>
+        <h1 class="text-lg font-semibold">治具产能监控系统</h1>
+      </div>
+      <button type="button" class="text-gray-400 hover:text-gray-600 md:hidden" id="closeSidebar">
+        <i class="fa fa-times"></i>
+      </button>
+    </div>
+    
+    <div class="h-full overflow-y-auto scrollbar-hide py-4">
+      <nav class="px-4 space-y-1">
+        <a href="index.html" class="flex items-center px-3 py-2 text-base font-medium rounded-lg text-gray-600 hover:bg-gray-100">
+          <i class="fa fa-dashboard w-5 h-5 mr-3"></i>
+          仪表盘
+        </a>
+        <a href="jig-management.html" class="flex items-center px-3 py-2 text-base font-medium rounded-lg text-gray-600 hover:bg-gray-100">
+          <i class="fa fa-cogs w-5 h-5 mr-3"></i>
+          治具管理
+        </a>
+        <a href="settings.html" class="flex items-center px-3 py-2 text-base font-medium rounded-lg bg-primary/10 text-primary">
+          <i class="fa fa-cog w-5 h-5 mr-3"></i>
+          设置
+        </a>
+        <a href="#" class="flex items-center px-3 py-2 text-base font-medium rounded-lg text-gray-600 hover:bg-gray-100">
+          <i class="fa fa-calendar w-5 h-5 mr-3"></i>
+          排程计划
+        </a>
+      </nav>
+    </div>
+  </div>
+
+  <!-- 顶部导航 -->
+  <header class="bg-white shadow-md">
+    <div class="container mx-auto px-4">
+      <div class="flex justify-between items-center h-16">
+        <div class="flex items-center">
+          <button type="button" class="text-gray-400 hover:text-gray-600 md:hidden" id="openSidebar">
+            <i class="fa fa-bars"></i>
+          </button>
+        </div>
+        <div class="flex items-center space-x-4">
+          <div class="relative">
+            <button id="userMenuButton" class="flex items-center space-x-2 text-gray-600 hover:text-gray-900">
+              <img class="h-8 w-8 rounded-full object-cover" src="https://picsum.photos/200/200?random=1" alt="用户头像">
+              <span class="text-sm font-medium">管理员</span>
+              <i class="fa fa-chevron-down text-xs text-gray-400"></i>
+            </button>
+            
+            <div class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-1 hidden z-50" id="userMenu">
+              <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                <i class="fa fa-user mr-2"></i> 个人资料
+              </a>
+              <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                <i class="fa fa-cog mr-2"></i> 设置
+              </a>
+              <div class="border-t border-gray-100 my-1"></div>
+              <a href="#" class="block px-4 py-2 text-sm text-danger hover:bg-gray-100">
+                <i class="fa fa-sign-out mr-2"></i> 退出登录
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- 内容区域 -->
+  <main class="container mx-auto px-4 py-6">
+    <div>
+      <h1 class="text-2xl font-bold">设置</h1>
+      <p class="text-gray-500 mt-1">配置系统的全局设置</p>
+    </div>
+
+    <div class="mt-6 bg-white rounded-xl shadow-sm p-6 card-hover">
+      <h2 class="text-lg font-semibold mb-4">数据存储设置</h2>
+      <form id="storageSettingsForm">
+        <div class="mb-4">
+          <label for="storageType" class="block text-sm font-medium text-gray-700 mb-1">数据存储类型</label>
+          <select id="storageType" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30">
+            <option value="json">JSON</option>
+            <option value="mysql">MySQL</option>
+          </select>
+        </div>
+        <button type="submit" class="py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors px-4">保存设置</button>
+      </form>
+    </div>
+
+    <div class="mt-6 bg-white rounded-xl shadow-sm p-6 card-hover">
+      <h2 class="text-lg font-semibold mb-4">分页设置</h2>
+      <form id="paginationSettingsForm">
+        <div class="mb-4">
+          <label for="pageSize" class="block text-sm font-medium text-gray-700 mb-1">每页显示数量</label>
+          <input type="number" id="pageSize" min="1" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30" placeholder="例如: 10">
+        </div>
+        <button type="submit" class="py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors px-4">保存设置</button>
+      </form>
+    </div>
+  </main>
+
+  <!-- 页脚 -->
+  <footer class="bg-white border-t border-gray-200 py-6 mt-6">
+    <div class="container mx-auto px-4">
+      <div class="flex flex-col md:flex-row justify-between items-center">
+        <div class="text-gray-500 text-sm mb-4 md:mb-0">
+          © 2025 治具产能监控系统. 保留所有权利.
+        </div>
+        <div class="flex space-x-6">
+          <a href="#" class="text-gray-500 hover:text-gray-700">
+            <i class="fa fa-question-circle"></i> 帮助中心
+          </a>
+          <a href="#" class="text-gray-500 hover:text-gray-700">
+            <i class="fa fa-file-text-o"></i> 文档
+          </a>
+          <a href="#" class="text-gray-500 hover:text-gray-700">
+            <i class="fa fa-phone"></i> 联系我们
+          </a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="settings.js"></script>
+</body>
+</html>

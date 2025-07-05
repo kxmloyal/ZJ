@@ -1,17 +1,18 @@
+// ZJ/server/routes/index.js
 const express = require('express');
 const router = express.Router();
+const fixtureController = require('../controllers/fixture.controller');
+const settingsController = require('../settings.controller');
 
-// 导入子路由
-const fixtureRoutes = require('./fixture.routes');
-const managementRoutes = require('./management.routes');
+// 治具相关路由
+router.get('/api/fixtures', fixtureController.getAllFixtures);
+router.post('/api/fixtures', fixtureController.createFixture);
+router.put('/api/fixtures/:id', fixtureController.updateFixture);
+router.delete('/api/fixtures/:id', fixtureController.deleteFixture);
+router.post('/api/fixtures/import', fixtureController.importFixtures);
 
-// 注册子路由
-router.use('/fixtures', fixtureRoutes);
-router.use('/management', managementRoutes);
-
-// 健康检查路由
-router.get('/health', (req, res) => {
-  res.json({ status: 'ok', timestamp: new Date().toISOString() });
-});
+// 设置相关路由
+router.post('/api/settings/storage', settingsController.saveStorageSettings);
+router.post('/api/settings/pagination', settingsController.savePaginationSettings);
 
 module.exports = router;

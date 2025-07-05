@@ -1,6 +1,5 @@
 const fs = require('fs-extra');
 const path = require('path');
-const { v4: uuidv4 } = require('uuid');
 const config = require('../../config/db.config');
 
 // 确保数据目录存在
@@ -39,7 +38,7 @@ class FixtureModel {
       const fixtures = await this.getAllFixtures();
       
       const newFixture = {
-        id: uuidv4(),
+        id: data.id, // 使用前端生成的治具编号
         ...data,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
