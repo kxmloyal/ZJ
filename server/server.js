@@ -11,7 +11,11 @@ const app = express();
 
 // 配置中间件
 function configureMiddleware() {
-  app.use(cors());
+  // 配置CORS白名单，仅允许特定域名访问API
+  app.use(cors({
+    origin: ['http://localhost:8080', 'https://your-production-domain.com']
+  }));
+  
   app.use(bodyParser.json());
   app.use(bodyParser.urlencoded({ extended: true }));
   app.use(morgan('dev')); // 日志中间件
@@ -37,17 +41,25 @@ function configure404Handler() {
 function configureErrorHandler() {
   app.use((err, req, res, next) => {
     console.error('服务器内部错误:', err.stack);
-    res.status(500).json({
+    
+    // 生产环境不返回堆栈信息
+    const errorResponse = {
       error: '服务器内部错误',
-      message: err.message,
-      stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
-    });
+      message: err.message
+    };
+    
+    if (process.env.NODE_ENV === 'development') {
+      errorResponse.stack = err.stack;
+    }
+    
+    res.status(500).json(errorResponse);
   });
 }
 
 // 启动服务器
 function startServer() {
   const PORT = parseInt(config.server.port, 10);
+  
   if (isNaN(PORT) || PORT < 1 || PORT > 65535) {
     console.error('无效的端口号:', config.server.port);
     process.exit(1);

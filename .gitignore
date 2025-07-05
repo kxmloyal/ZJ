@@ -1,42 +1,20 @@
 # 环境配置
-# .env 文件通常包含敏感信息，如数据库连接字符串、API 密钥等，不应该提交到版本控制系统
 .env
-# node_modules 是 Node.js 项目中存放依赖包的目录，可通过 npm install 重新安装，无需提交
 node_modules
 
 # 日志文件
-# data/logs 目录下的所有日志文件，这些文件记录运行信息且可能包含敏感数据，无需提交
 data/logs/*
 
 # 数据库文件
-# data 目录下的所有 .db 和 .sqlite 数据库文件，可通过备份或重建数据库恢复，无需提交
 data/*.db
 data/*.sqlite
 
 # 临时文件
-# 所有扩展名为 .log、.tmp 和 .temp 的临时文件，通常在程序运行中临时生成，无需保留
 *.log
 *.tmp
 *.temp
 
-# 操作系统生成的文件
-# macOS 系统下的 .DS_Store 文件，用于存储文件夹的自定义属性
-.DS_Store
-# Windows 系统下的 Thumbs.db 文件，用于存储文件夹中图片的缩略图缓存
-Thumbs.db
-
 # 开发工具生成的文件
-# Visual Studio Code 的 .vscode 目录，包含工作区特定的配置信息
-.vscode/
-# IntelliJ IDEA 的 .idea 目录，包含项目的配置信息
 .idea/
-
-# 打包构建产物
-# 前端项目的 dist 目录，通常包含打包后的静态资源文件
-dist/
-# 后端项目的 build 目录，可能包含编译后的代码文件
-build/
-
-# 测试报告文件
-# Jest 测试框架生成的测试报告目录
-coverage/
+.vscode/
+.DS_Store
