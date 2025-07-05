@@ -4,12 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>治具产能监控系统 - 治具管理</title>
-  <!-- 引入Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- 引入Font Awesome -->
   <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
   
-  <!-- Tailwind配置 -->
+  <!-- Tailwind 配置 -->
   <script>
     tailwind.config = {
       theme: {
@@ -29,7 +27,6 @@
     }
   </script>
   
-  <!-- 自定义工具类 -->
   <style type="text/tailwindcss">
     @layer utilities {
       .content-auto {
@@ -42,956 +39,311 @@
       .scrollbar-hide::-webkit-scrollbar {
         display: none;
       }
+      .card-hover {
+        transition: transform 0.3s, box-shadow 0.3s;
+      }
+      .card-hover:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      }
     }
   </style>
 </head>
-<body class="bg-gray-50 font-inter text-gray-800 min-h-screen flex flex-col">
-  <!-- 顶部导航栏 -->
-  <header class="bg-white shadow-sm fixed top-0 left-0 right-0 z-40">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="flex justify-between h-16">
-        <div class="flex items-center">
-          <button id="openSidebar" class="p-2 rounded-md text-gray-500 hover:text-primary hover:bg-gray-100 focus:outline-none lg:hidden">
-            <i class="fa fa-bars"></i>
+<body class="font-inter bg-gray-50 text-dark min-h-screen flex flex-col">
+  <!-- 侧边栏导航 -->
+  <div class="fixed inset-y-0 left-0 z-40 w-64 bg-white shadow-md transform transition-transform duration-300 ease-in-out md:translate-x-0 -translate-x-full" id="sidebar">
+    <div class="flex h-16 items-center justify-between border-b border-gray-200 px-4">
+      <div class="flex items-center">
+        <i class="fa fa-industry text-primary text-2xl mr-3"></i>
+        <h1 class="text-lg font-semibold">治具产能监控系统</h1>
+      </div>
+      <button type="button" class="text-gray-400 hover:text-gray-600 md:hidden" id="closeSidebar">
+        <i class="fa fa-times"></i>
+      </button>
+    </div>
+    
+    <div class="h-full overflow-y-auto scrollbar-hide py-4">
+      <nav class="px-4 space-y-1">
+        <a href="index.html" class="flex items-center px-3 py-2 text-base font-medium rounded-lg bg-primary/10 text-primary">
+          <i class="fa fa-dashboard w-5 h-5 mr-3"></i>
+          仪表盘
+        </a>
+        <a href="jig-management.html" class="flex items-center px-3 py-2 text-base font-medium rounded-lg text-gray-600 hover:bg-gray-100">
+          <i class="fa fa-cogs w-5 h-5 mr-3"></i>
+          治具管理
+        </a>
+        <a href="#" class="flex items-center px-3 py-2 text-base font-medium rounded-lg text-gray-600 hover:bg-gray-100">
+          <i class="fa fa-calendar w-5 h-5 mr-3"></i>
+          排程计划
+        </a>
+        <a href="#" class="flex items-center px-3 py-2 text-base font-medium rounded-lg text-gray-600 hover:bg-gray-100">
+          <i class="fa fa-cog w-5 h-5 mr-3"></i>
+          设置
+        </a>
+      </nav>
+    </div>
+  </div>
+  
+  <!-- 主内容区域 -->
+  <div class="flex-1 flex flex-col md:pl-64">
+    <!-- 顶部导航 -->
+    <header class="bg-white shadow-md px-4 py-3 flex items-center justify-between">
+      <button type="button" class="text-gray-400 hover:text-gray-600 md:hidden" id="openSidebar">
+        <i class="fa fa-bars"></i>
+      </button>
+      
+      <div class="flex items-center space-x-4">
+        <div class="relative">
+          <button type="button" class="flex items-center text-gray-600 hover:text-gray-800" id="userMenuButton">
+            <img src="https://via.placeholder.com/32" alt="用户头像" class="w-8 h-8 rounded-full mr-2">
+            <span class="hidden md:block">John Doe</span>
+            <i class="fa fa-chevron-down ml-1 text-xs"></i>
           </button>
-          <a href="#" class="flex-shrink-0 flex items-center">
-            <span class="text-primary font-bold text-xl">治具产能监控系统</span>
-          </a>
-        </div>
-        <div class="flex items-center">
-          <div class="relative ml-3">
-            <div>
-              <button id="userMenuButton" class="flex items-center max-w-xs rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
-                <img class="h-8 w-8 rounded-full object-cover" src="https://picsum.photos/200/200" alt="用户头像">
-              </button>
-            </div>
-            <div id="userMenu" class="hidden origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 py-1 z-50">
-              <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                <i class="fa fa-user-circle mr-2"></i>个人资料
-              </a>
-              <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                <i class="fa fa-cog mr-2"></i>设置
-              </a>
-              <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                <i class="fa fa-sign-out mr-2"></i>退出登录
-              </a>
-            </div>
+          
+          <div class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-md hidden" id="userMenu">
+            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">个人资料</a>
+            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">设置</a>
+            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">退出登录</a>
           </div>
         </div>
       </div>
-    </div>
-  </header>
-
-  <div class="flex h-screen pt-16">
-    <!-- 侧边栏 -->
-    <aside id="sidebar" class="-translate-x-full lg:translate-x-0 fixed inset-y-0 left-0 z-30 w-64 bg-white shadow-lg transform transition duration-300 ease-in-out overflow-y-auto scrollbar-hide">
-      <div class="py-4 px-3">
-        <div class="mb-6">
-          <h2 class="text-xs font-semibold text-gray-400 uppercase tracking-wider">主导航</h2>
-          <nav class="mt-4 space-y-1">
-            <a href="#" class="group flex items-center px-2 py-2 text-sm font-medium rounded-md text-gray-900 bg-gray-100">
-              <i class="fa fa-tachometer mr-3 text-primary"></i>
-              仪表盘
-            </a>
-            <a href="#" class="group flex items-center px-2 py-2 text-sm font-medium rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-50">
-              <i class="fa fa-cogs mr-3 text-gray-400 group-hover:text-primary"></i>
-              治具管理
-            </a>
-            <a href="#" class="group flex items-center px-2 py-2 text-sm font-medium rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-50">
-              <i class="fa fa-calendar mr-3 text-gray-400 group-hover:text-primary"></i>
-              排程计划
-            </a>
-            <a href="#" class="group flex items-center px-2 py-2 text-sm font-medium rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-50">
-              <i class="fa fa-bar-chart mr-3 text-gray-400 group-hover:text-primary"></i>
-              数据分析
-            </a>
-            <a href="#" class="group flex items-center px-2 py-2 text-sm font-medium rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-50">
-              <i class="fa fa-bell mr-3 text-gray-400 group-hover:text-primary"></i>
-              预警管理
-            </a>
-          </nav>
+    </header>
+    
+    <!-- 页面内容 -->
+    <main class="p-6">
+      <!-- 操作工具栏 -->
+      <div class="flex flex-wrap items-center justify-between mb-6">
+        <div class="flex items-center space-x-4 mb-2 md:mb-0">
+          <div class="relative">
+            <input type="text" id="searchInput" placeholder="搜索治具编号/类型..." 
+              class="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30">
+            <i class="fa fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+          </div>
+          
+          <button id="batchImportBtn" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors flex items-center">
+            <i class="fa fa-upload mr-2"></i> 批量导入
+          </button>
+          
+          <button id="batchExportBtn" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors flex items-center">
+            <i class="fa fa-download mr-2"></i> 批量导出
+          </button>
+          
+          <button id="batchDeleteBtn" class="px-4 py-2 bg-danger text-white rounded-lg hover:bg-danger/90 transition-colors flex items-center">
+            <i class="fa fa-trash mr-2"></i> 批量删除
+          </button>
+          
+          <button id="addFixtureBtn" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors flex items-center">
+            <i class="fa fa-plus mr-2"></i> 新增治具
+          </button>
         </div>
         
-        <div class="mb-6">
-          <h2 class="text-xs font-semibold text-gray-400 uppercase tracking-wider">系统管理</h2>
-          <nav class="mt-4 space-y-1">
-            <a href="#" class="group flex items-center px-2 py-2 text-sm font-medium rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-50">
-              <i class="fa fa-users mr-3 text-gray-400 group-hover:text-primary"></i>
-              用户管理
-            </a>
-            <a href="#" class="group flex items-center px-2 py-2 text-sm font-medium rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-50">
-              <i class="fa fa-lock mr-3 text-gray-400 group-hover:text-primary"></i>
-              权限管理
-            </a>
-            <a href="#" class="group flex items-center px-2 py-2 text-sm font-medium rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-50">
-              <i class="fa fa-cog mr-3 text-gray-400 group-hover:text-primary"></i>
-              系统设置
-            </a>
-          </nav>
+        <div class="flex items-center space-x-2">
+          <input type="checkbox" id="selectAll" class="h-4 w-4 text-primary focus:ring-primary/30 border-gray-300 rounded">
+          <label for="selectAll" class="text-sm text-gray-600">全选</label>
         </div>
       </div>
       
-      <div class="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-200">
-        <button id="closeSidebar" class="w-full flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
-          <i class="fa fa-times mr-2"></i>
-          关闭菜单
-        </button>
-      </div>
-    </aside>
-
-    <!-- 主内容区 -->
-    <main class="flex-1 lg:ml-64 overflow-x-hidden overflow-y-auto">
-      <div class="px-4 sm:px-6 lg:px-8 py-6">
-        <!-- 筛选器 -->
-        <div class="bg-white shadow-sm rounded-lg p-4 mb-4">
-          <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div>
-              <label for="typeFilter" class="block text-sm font-medium text-gray-700 mb-1">治具类型</label>
-              <select id="typeFilter" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring focus:ring-primary/20 focus:ring-opacity-50">
-                <option value="">全部</option>
-                <option value="注塑机">注塑机</option>
-                <option value="冲压机">冲压机</option>
-                <option value="模具">模具</option>
-                <option value="检具">检具</option>
-              </select>
-            </div>
-            <div>
-              <label for="statusFilter" class="block text-sm font-medium text-gray-700 mb-1">使用状态</label>
-              <select id="statusFilter" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring focus:ring-primary/20 focus:ring-opacity-50">
-                <option value="">全部</option>
-                <option value="normal">正常</option>
-                <option value="warning">接近超量</option>
-                <option value="over">超量</option>
-              </select>
-            </div>
-            <div>
-              <label for="capacityFilter" class="block text-sm font-medium text-gray-700 mb-1">产能范围</label>
-              <select id="capacityFilter" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring focus:ring-primary/20 focus:ring-opacity-50">
-                <option value="">全部</option>
-                <option value="0-5000">0-5000</option>
-                <option value="5000-10000">5000-10000</option>
-                <option value="10000-20000">10000-20000</option>
-                <option value="20000-30000">20000-30000</option>
-                <option value="30000+">30000以上</option>
-              </select>
-            </div>
-            <div>
-              <label for="searchInput" class="block text-sm font-medium text-gray-700 mb-1">搜索</label>
-              <div class="mt-1 relative rounded-md shadow-sm">
-                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <i class="fa fa-search text-gray-400"></i>
-                </div>
-                <input type="text" id="searchInput" class="focus:ring-primary focus:border-primary block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md" placeholder="搜索治具编号或类型">
-              </div>
-            </div>
+      <!-- 筛选工具栏 -->
+      <div class="bg-white rounded-xl shadow-sm p-4 mb-6 card-hover">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">治具类型</label>
+            <select id="typeFilter" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30">
+              <option value="">全部</option>
+              <option value="注塑模具">注塑模具</option>
+              <option value="冲压模具">冲压模具</option>
+              <option value="压铸模具">压铸模具</option>
+              <option value="锻造模具">锻造模具</option>
+              <option value="挤出模具">挤出模具</option>
+              <option value="其他">其他</option>
+            </select>
           </div>
-          <div class="mt-4 flex justify-end">
-            <button id="resetFilterBtn" class="ml-3 inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
-              <i class="fa fa-refresh mr-2"></i>重置筛选
+          
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">治具状态</label>
+            <select id="statusFilter" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30">
+              <option value="">全部</option>
+              <option value="normal">正常</option>
+              <option value="warning">接近超量</option>
+              <option value="over">超量</option>
+            </select>
+          </div>
+          
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">产能范围</label>
+            <select id="capacityFilter" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30">
+              <option value="">全部</option>
+              <option value="0-10000">0 - 10000</option>
+              <option value="10001-20000">10001 - 20000</option>
+              <option value="20001-30000">20001 - 30000</option>
+              <option value="30000+">30000+</option>
+            </select>
+          </div>
+          
+          <div class="flex items-end">
+            <button id="resetFilterBtn" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors">
+              重置筛选
             </button>
           </div>
         </div>
+      </div>
+      
+      <!-- 治具列表 -->
+      <div class="bg-white rounded-xl shadow-sm overflow-hidden card-hover">
+        <div class="p-6 border-b border-gray-200">
+          <div class="flex items-center justify-between">
+            <h3 class="font-semibold text-lg">治具列表</h3>
+            <div class="text-sm text-gray-500">
+              显示 <span id="showingRange">0-0</span> 条，共 <span id="totalCount">0</span> 条
+            </div>
+          </div>
+        </div>
         
-        <!-- 治具表格 -->
-        <div class="bg-white shadow-sm rounded-lg overflow-hidden">
-          <div class="flex flex-col md:flex-row md:items-center md:justify-between p-4 border-b border-gray-200">
-            <h3 class="text-lg font-medium text-gray-900">治具管理</h3>
-            <div class="mt-4 flex flex-col sm:flex-row sm:items-center sm:space-x-3 space-y-2 sm:space-y-0">
-              <button id="addFixtureBtn" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
-                <i class="fa fa-plus mr-2"></i> 添加治具
-              </button>
-              <button id="batchExportBtn" class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
-                <i class="fa fa-download mr-2"></i> 批量导出
-              </button>
-              <button id="batchImportBtn" class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
-                <i class="fa fa-upload mr-2"></i> 批量导入
-              </button>
-            </div>
-          </div>
-          <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200">
-              <thead class="bg-gray-50">
-                <tr>
-                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    <input type="checkbox" id="selectAll" class="h-4 w-4 text-primary focus:ring-primary/30 border-gray-300 rounded">
-                  </th>
-                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">治具编号</th>
-                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">治具类型</th>
-                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">固定产能</th>
-                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">当前排程</th>
-                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">利用率</th>
-                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">状态</th>
-                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">更新时间</th>
-                  <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">操作</th>
-                </tr>
-              </thead>
-              <tbody id="fixtureTableBody" class="bg-white divide-y divide-gray-200">
-                <tr class="text-center">
-                  <td colspan="9" class="px-6 py-10 text-gray-500">
-                    <i class="fa fa-spinner fa-spin text-xl mb-2"></i>
-                    <p>正在加载数据...</p>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-          
-          <!-- 分页控件 -->
-          <div class="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
-            <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
-              <div>
-                <p class="text-sm text-gray-700">
-                  显示 <span id="showingRange">1-10</span> 条，共 <span id="totalCount">0</span> 条
-                </p>
-              </div>
-              <div>
-                <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
-                  <button id="prevPage" class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed" disabled>
-                    <span class="sr-only">上一页</span>
-                    <i class="fa fa-chevron-left"></i>
-                  </button>
-                  <button id="nextPage" class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
-                    <span class="sr-only">下一页</span>
-                    <i class="fa fa-chevron-right"></i>
-                  </button>
-                </nav>
-              </div>
-            </div>
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+              <tr>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <input type="checkbox" id="selectAllHeader" class="h-4 w-4 text-primary focus:ring-primary/30 border-gray-300 rounded">
+                </th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">治具编号</th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">类型</th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">固定产能(件/月)</th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">当前排程(件)</th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">利用率</th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">状态</th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">更新时间</th>
+                <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">操作</th>
+              </tr>
+            </thead>
+            <tbody id="fixtureTableBody" class="bg-white divide-y divide-gray-200">
+              <!-- 表格内容将通过JavaScript动态生成 -->
+            </tbody>
+          </table>
+        </div>
+        
+        <div class="p-6 border-t border-gray-200 flex items-center justify-between">
+          <div class="flex items-center space-x-2">
+            <button id="prevPage" class="px-3 py-1 text-sm bg-gray-100 hover:bg-gray-200 rounded-md" disabled>上一页</button>
+            <button id="nextPage" class="px-3 py-1 text-sm bg-gray-100 hover:bg-gray-200 rounded-md">下一页</button>
           </div>
         </div>
       </div>
     </main>
+    
+    <!-- 页脚 -->
+    <footer class="bg-white border-t border-gray-200 px-4 py-3 mt-auto">
+      <div class="flex justify-between items-center">
+        <div class="text-sm text-gray-500">
+          &copy; 2025 治具产能监控系统. 保留所有权利.
+        </div>
+        
+        <div class="flex space-x-4">
+          <a href="#" class="text-gray-500 hover:text-gray-700">
+            <i class="fa fa-question-circle"></i> 帮助中心
+          </a>
+          <a href="#" class="text-gray-500 hover:text-gray-700">
+            <i class="fa fa-file-text-o"></i> 文档
+          </a>
+          <a href="#" class="text-gray-500 hover:text-gray-700">
+            <i class="fa fa-phone"></i> 联系我们
+          </a>
+        </div>
+      </div>
+    </footer>
   </div>
 
-  <!-- 添加/编辑治具模态框 -->
-  <div id="fixtureModal" class="hidden fixed inset-0 bg-black bg-opacity-50 overflow-y-auto z-50">
-    <div class="flex items-center justify-center min-h-screen p-4">
-      <div class="bg-white rounded-lg max-w-md w-full mx-auto overflow-hidden shadow-xl transform transition-all">
-        <div class="bg-gray-50 px-4 py-3 border-b border-gray-200">
-          <div class="flex items-center justify-between">
-            <h3 id="fixtureFormTitle" class="text-lg font-medium text-gray-900">添加治具</h3>
-            <button id="closeModal" class="text-gray-400 hover:text-gray-500 focus:outline-none">
-              <i class="fa fa-times"></i>
-            </button>
+  <!-- 新增/编辑治具模态框 -->
+  <div id="fixtureModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300">
+    <div id="modalContent" class="bg-white rounded-xl shadow-xl w-full max-w-md mx-4 transform scale-95 transition-transform duration-300">
+      <div class="p-5 border-b border-gray-200 flex items-center justify-between">
+        <h3 id="modalTitle" class="font-semibold text-lg">新增治具</h3>
+        <button id="closeModal" class="text-gray-400 hover:text-gray-600 transition-colors">
+          <i class="fa fa-times"></i>
+        </button>
+      </div>
+      
+      <div class="p-5">
+        <form id="fixtureForm" class="space-y-4">
+          <div>
+            <label for="fixtureId" class="block text-sm font-medium text-gray-700 mb-1">治具编号</label>
+            <input type="text" id="fixtureId" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30" placeholder="自动生成" readonly>
           </div>
-        </div>
-        <form id="fixtureForm">
-          <div class="px-4 py-5 bg-white space-y-4">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label for="fixtureCode" class="block text-sm font-medium text-gray-700">治具编号</label>
-                <input type="text" id="fixtureCode" name="code" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring focus:ring-primary/20 focus:ring-opacity-50">
-                <p id="codeError" class="mt-1 text-sm text-red-500 hidden error-message"></p>
-              </div>
-              <div>
-                <label for="fixtureType" class="block text-sm font-medium text-gray-700">治具类型</label>
-                <select id="fixtureType" name="type" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring focus:ring-primary/20 focus:ring-opacity-50">
-                  <option value="">请选择</option>
-                  <option value="注塑机">注塑机</option>
-                  <option value="冲压机">冲压机</option>
-                  <option value="模具">模具</option>
-                  <option value="检具">检具</option>
-                </select>
-                <p id="typeError" class="mt-1 text-sm text-red-500 hidden error-message"></p>
-              </div>
-            </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label for="fixtureCapacity" class="block text-sm font-medium text-gray-700">固定产能</label>
-                <input type="number" id="fixtureCapacity" name="capacity" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring focus:ring-primary/20 focus:ring-opacity-50">
-                <p id="capacityError" class="mt-1 text-sm text-red-500 hidden error-message"></p>
-              </div>
-              <div>
-                <label for="fixtureScheduled" class="block text-sm font-medium text-gray-700">当前排程</label>
-                <input type="number" id="fixtureScheduled" name="scheduled" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring focus:ring-primary/20 focus:ring-opacity-50">
-                <p id="scheduledError" class="mt-1 text-sm text-red-500 hidden error-message"></p>
-              </div>
-            </div>
-            <div>
-              <label for="fixtureDescription" class="block text-sm font-medium text-gray-700">治具描述</label>
-              <textarea id="fixtureDescription" name="description" rows="3" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring focus:ring-primary/20 focus:ring-opacity-50"></textarea>
-            </div>
+          
+          <div>
+            <label for="fixtureType" class="block text-sm font-medium text-gray-700 mb-1">治具类型 <span class="text-danger">*</span></label>
+            <select id="fixtureType" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30" required>
+              <option value="">请选择类型</option>
+              <option value="注塑模具">注塑模具</option>
+              <option value="冲压模具">冲压模具</option>
+              <option value="压铸模具">压铸模具</option>
+              <option value="锻造模具">锻造模具</option>
+              <option value="挤出模具">挤出模具</option>
+              <option value="其他">其他</option>
+            </select>
           </div>
-          <div class="bg-gray-50 px-4 py-3 flex items-center justify-end border-t border-gray-200">
-            <button type="button" id="cancelModal" class="mr-3 inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
-              取消
-            </button>
-            <button type="submit" id="submitFixtureBtn" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
-              添加治具
-            </button>
+          
+          <div>
+            <label for="fixtureCapacity" class="block text-sm font-medium text-gray-700 mb-1">固定产能 (件/月) <span class="text-danger">*</span></label>
+            <input type="number" id="fixtureCapacity" min="1" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30" placeholder="例如: 20000" required>
+          </div>
+          
+          <div>
+            <label for="fixtureSchedule" class="block text-sm font-medium text-gray-700 mb-1">当前排程量 (件) <span class="text-danger">*</span></label>
+            <input type="number" id="fixtureSchedule" min="0" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30" placeholder="例如: 18500" required>
+          </div>
+          
+          <div>
+            <label for="fixtureLocation" class="block text-sm font-medium text-gray-700 mb-1">存放位置</label>
+            <input type="text" id="fixtureLocation" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30" placeholder="例如: A区-01货架">
+          </div>
+          
+          <div>
+            <label for="fixtureDescription" class="block text-sm font-medium text-gray-700 mb-1">治具描述</label>
+            <textarea id="fixtureDescription" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30" placeholder="描述治具的用途、规格等信息"></textarea>
+          </div>
+          
+          <div class="pt-2">
+            <div class="flex space-x-3">
+              <button type="button" id="cancelModal" class="flex-1 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">取消</button>
+              <button type="submit" class="flex-1 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors">保存</button>
+            </div>
           </div>
         </form>
       </div>
     </div>
   </div>
 
-  <!-- 批量导入模态框 -->
-  <div id="batchImportModal" class="hidden fixed inset-0 bg-black bg-opacity-50 overflow-y-auto z-50">
-    <div class="flex items-center justify-center min-h-screen p-4">
-      <div class="bg-white rounded-lg max-w-md w-full mx-auto overflow-hidden shadow-xl transform transition-all">
-        <div class="bg-gray-50 px-4 py-3 border-b border-gray-200">
-          <h3 class="text-lg font-medium text-gray-900">批量导入治具</h3>
-        </div>
-        <div class="px-4 py-5 bg-white">
-          <div class="mb-4">
-            <p class="text-sm text-gray-600 mb-2">请上传JSON格式的治具数据文件。</p>
-            <div class="mt-2">
-              <div class="flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
-                <div class="space-y-1 text-center">
-                  <i class="fa fa-cloud-upload text-gray-400 text-3xl"></i>
-                  <div class="flex text-sm text-gray-600">
-                    <label for="importFile" class="relative cursor-pointer bg-white rounded-md font-medium text-primary hover:text-primary/80">
-                      <span>上传文件</span>
-                      <input id="importFile" name="file" type="file" accept=".json" class="sr-only">
-                    </label>
-                    <p class="pl-1">或拖放文件</p>
-                  </div>
-                  <p class="text-xs text-gray-500">
-                    支持 JSON 格式
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="bg-gray-50 px-4 py-3 flex items-center justify-end border-t border-gray-200">
-          <button type="button" id="cancelBatchAction" class="mr-3 inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
-            取消
-          </button>
-          <button type="button" id="confirmBatchAction" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary" disabled>
-            确认导入
-          </button>
-        </div>
+  <!-- 批量操作模态框 -->
+  <div id="batchActionModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300">
+    <div id="batchActionContent" class="bg-white rounded-xl shadow-xl w-full max-w-md mx-4 transform scale-95 transition-transform duration-300">
+      <div class="p-5 border-b border-gray-200 flex items-center justify-between">
+        <h3 id="batchActionTitle" class="font-semibold text-lg">批量操作</h3>
+        <button id="cancelBatchAction" class="text-gray-400 hover:text-gray-600 transition-colors">
+          <i class="fa fa-times"></i>
+        </button>
       </div>
-    </div>
-  </div>
-
-  <!-- 批量导入确认对话框 -->
-  <div id="batchImportConfirm" class="hidden fixed inset-0 bg-black bg-opacity-50 overflow-y-auto z-50">
-    <div class="flex items-center justify-center min-h-screen p-4">
-      <div class="bg-white rounded-lg max-w-md w-full mx-auto overflow-hidden shadow-xl transform transition-all">
-        <div class="bg-gray-50 px-4 py-3 border-b border-gray-200">
-          <h3 class="text-lg font-medium text-gray-900">确认导入</h3>
-        </div>
-        <div class="px-4 py-5 bg-white">
-          <p id="batchImportSummary" class="text-sm text-gray-600">
-            即将导入 X 条治具数据，是否继续？
-          </p>
-        </div>
-        <div class="bg-gray-50 px-4 py-3 flex items-center justify-end border-t border-gray-200">
-          <button type="button" class="mr-3 inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary" onclick="document.getElementById('batchImportConfirm').classList.add('hidden')">
-            取消
-          </button>
-          <button type="button" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary" onclick="confirmBatchImport()">
-            确认
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- 批量导入结果对话框 -->
-  <div id="batchImportResult" class="hidden fixed inset-0 bg-black bg-opacity-50 overflow-y-auto z-50">
-    <div class="flex items-center justify-center min-h-screen p-4">
-      <div class="bg-white rounded-lg max-w-md w-full mx-auto overflow-hidden shadow-xl transform transition-all">
-        <div class="bg-gray-50 px-4 py-3 border-b border-gray-200">
-          <h3 class="text-lg font-medium text-gray-900">导入结果</h3>
-        </div>
-        <div class="px-4 py-5 bg-white">
-          <div class="bg-green-50 border-l-4 border-green-400 p-4 mb-4">
-            <div class="flex">
-              <div class="flex-shrink-0">
-                <i class="fa fa-check-circle text-green-500"></i>
-              </div>
-              <div class="ml-3">
-                <p class="text-sm text-green-700">
-                  <span id="batchImportSuccessCount">0</span> 条数据导入成功
-                </p>
-              </div>
-            </div>
+      
+      <div class="p-5">
+        <p id="batchActionMessage" class="text-sm text-gray-700">确认执行批量操作？</p>
+        <div class="pt-2">
+          <div class="flex space-x-3">
+            <button type="button" id="cancelBatchAction" class="flex-1 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">取消</button>
+            <button type="button" id="confirmBatchAction" class="flex-1 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors">确认</button>
           </div>
-          <div class="bg-red-50 border-l-4 border-red-400 p-4">
-            <div class="flex">
-              <div class="flex-shrink-0">
-                <i class="fa fa-times-circle text-red-500"></i>
-              </div>
-              <div class="ml-3">
-                <p class="text-sm text-red-700">
-                  <span id="batchImportFailedCount">0</span> 条数据导入失败
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="bg-gray-50 px-4 py-3 flex items-center justify-end border-t border-gray-200">
-          <button type="button" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary" onclick="document.getElementById('batchImportResult').classList.add('hidden'); document.getElementById('batchImportModal').classList.add('hidden')">
-            完成
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- 批量导入错误对话框 -->
-  <div id="batchImportError" class="hidden fixed inset-0 bg-black bg-opacity-50 overflow-y-auto z-50">
-    <div class="flex items-center justify-center min-h-screen p-4">
-      <div class="bg-white rounded-lg max-w-md w-full mx-auto overflow-hidden shadow-xl transform transition-all">
-        <div class="bg-gray-50 px-4 py-3 border-b border-gray-200">
-          <h3 class="text-lg font-medium text-gray-900">导入错误</h3>
-        </div>
-        <div class="px-4 py-5 bg-white">
-          <div class="bg-red-50 border-l-4 border-red-400 p-4">
-            <div class="flex">
-              <div class="flex-shrink-0">
-                <i class="fa fa-exclamation-circle text-red-500"></i>
-              </div>
-              <div class="ml-3">
-                <p id="batchImportErrorMessage" class="text-sm text-red-700">
-                  导入过程中发生错误
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="bg-gray-50 px-4 py-3 flex items-center justify-end border-t border-gray-200">
-          <button type="button" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary" onclick="document.getElementById('batchImportError').classList.add('hidden')">
-            关闭
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- 加载中状态 -->
-  <div id="batchImportLoading" class="hidden fixed inset-0 bg-black bg-opacity-50 overflow-y-auto z-50">
-    <div class="flex items-center justify-center min-h-screen p-4">
-      <div class="bg-white rounded-lg max-w-md w-full mx-auto overflow-hidden shadow-xl transform transition-all">
-        <div class="bg-gray-50 px-4 py-3 border-b border-gray-200">
-          <h3 class="text-lg font-medium text-gray-900">正在导入</h3>
-        </div>
-        <div class="px-4 py-8 bg-white text-center">
-          <i class="fa fa-spinner fa-spin text-primary text-4xl mb-4"></i>
-          <p class="text-sm text-gray-600">正在处理数据，请稍候...</p>
         </div>
       </div>
     </div>
   </div>
 
   <!-- 提示消息 -->
-  <div id="toast" class="fixed bottom-4 right-4 transform translate-y-20 opacity-0 transition-all duration-300 z-50 flex items-center px-4 py-3 rounded-md shadow-lg bg-dark text-white">
-    <i id="toastIcon" class="fa fa-check-circle mr-2"></i>
-    <p id="toastMessage" class="text-sm font-medium"></p>
+  <div id="toast" class="fixed bottom-4 right-4 bg-dark text-white px-4 py-2 rounded-md shadow-md translate-y-20 opacity-0 transition-transform duration-300">
+    <div class="flex items-center">
+      <i id="toastIcon" class="fa fa-check-circle mr-2"></i>
+      <span id="toastMessage"></span>
+    </div>
   </div>
 
-  <!-- JavaScript -->
-  <script>
-    // 全局变量
-    let currentPage = 1;
-    const pageSize = 10;
-    let totalFixtures = 0;
-    let fixtures = [];
-    let selectedFixtures = [];
-    let isEditing = false;
-    let currentFixtureId = null;
-    let importData = null;
-
-    // 初始化页面
-    document.addEventListener('DOMContentLoaded', () => {
-      loadFixtures();
-      initEventListeners();
-    });
-
-    // 初始化事件监听
-    function initEventListeners() {
-      // 侧边栏控制
-      document.getElementById('openSidebar').addEventListener('click', () => {
-        document.getElementById('sidebar').classList.remove('-translate-x-full');
-      });
-      
-      document.getElementById('closeSidebar').addEventListener('click', () => {
-        document.getElementById('sidebar').classList.add('-translate-x-full');
-      });
-      
-      // 用户菜单控制
-      document.getElementById('userMenuButton').addEventListener('click', () => {
-        document.getElementById('userMenu').classList.toggle('hidden');
-      });
-      
-      // 点击页面其他区域关闭用户菜单
-      document.addEventListener('click', (event) => {
-        const userMenuButton = document.getElementById('userMenuButton');
-        const userMenu = document.getElementById('userMenu');
-        
-        if (!userMenuButton.contains(event.target) && !userMenu.contains(event.target)) {
-          userMenu.classList.add('hidden');
-        }
-      });
-      
-      // 添加治具按钮
-      document.getElementById('addFixtureBtn').addEventListener('click', () => {
-        isEditing = false;
-        currentFixtureId = null;
-        document.getElementById('fixtureFormTitle').textContent = '添加治具';
-        document.getElementById('submitFixtureBtn').textContent = '添加治具';
-        document.getElementById('fixtureForm').reset();
-        hideErrorMessages();
-        document.getElementById('fixtureModal').classList.remove('hidden');
-      });
-      
-      // 关闭模态框
-      document.getElementById('closeModal').addEventListener('click', () => {
-        document.getElementById('fixtureModal').classList.add('hidden');
-      });
-      
-      document.getElementById('cancelModal').addEventListener('click', () => {
-        document.getElementById('fixtureModal').classList.add('hidden');
-      });
-      
-      // 表单提交
-      document.getElementById('fixtureForm').addEventListener('submit', (event) => {
-        event.preventDefault();
-        if (validateForm()) {
-          const formData = {
-            code: document.getElementById('fixtureCode').value,
-            type: document.getElementById('fixtureType').value,
-            capacity: parseInt(document.getElementById('fixtureCapacity').value),
-            scheduled: parseInt(document.getElementById('fixtureScheduled').value),
-            description: document.getElementById('fixtureDescription').value,
-            lastUpdate: new Date().toISOString().slice(0, 10)
-          };
-          
-          if (isEditing && currentFixtureId !== null) {
-            // 更新现有治具
-            const index = fixtures.findIndex(fixture => fixture.id === currentFixtureId);
-            if (index !== -1) {
-              fixtures[index] = { ...fixtures[index], ...formData };
-              showToast('治具更新成功', 'success');
-            }
-          } else {
-            // 添加新治具
-            const newFixture = {
-              id: Date.now().toString(), // 使用时间戳作为唯一ID
-              ...formData
-            };
-            fixtures.unshift(newFixture);
-            showToast('治具添加成功', 'success');
-          }
-          
-          document.getElementById('fixtureModal').classList.add('hidden');
-          renderFixtures();
-        }
-      });
-      
-      // 批量导入相关
-      document.getElementById('batchImportBtn').addEventListener('click', () => {
-        document.getElementById('batchImportModal').classList.remove('hidden');
-        document.getElementById('importFile').value = '';
-        document.getElementById('confirmBatchAction').disabled = true;
-      });
-      
-      document.getElementById('cancelBatchAction').addEventListener('click', () => {
-        document.getElementById('batchImportModal').classList.add('hidden');
-      });
-      
-      document.getElementById('importFile').addEventListener('change', (event) => {
-        const file = event.target.files[0];
-        if (file) {
-          const reader = new FileReader();
-          reader.onload = (e) => {
-            try {
-              importData = JSON.parse(e.target.result);
-              if (Array.isArray(importData) && importData.length > 0) {
-                document.getElementById('batchImportSummary').textContent = `即将导入 ${importData.length} 条治具数据，是否继续？`;
-                document.getElementById('confirmBatchAction').disabled = false;
-              } else {
-                showError('请上传有效的JSON数组文件');
-              }
-            } catch (error) {
-              showError('文件解析失败，请确保上传的是有效的JSON文件');
-              console.error('JSON解析错误:', error);
-            }
-          };
-          reader.readAsText(file);
-        }
-      });
-      
-      // 筛选器相关
-      document.getElementById('typeFilter').addEventListener('change', filterFixtures);
-      document.getElementById('statusFilter').addEventListener('change', filterFixtures);
-      document.getElementById('capacityFilter').addEventListener('change', filterFixtures);
-      document.getElementById('searchInput').addEventListener('input', filterFixtures);
-      document.getElementById('resetFilterBtn').addEventListener('click', resetFilters);
-      
-      // 分页控制
-      document.getElementById('prevPage').addEventListener('click', () => {
-        if (currentPage > 1) {
-          currentPage--;
-          renderFixtures();
-        }
-      });
-      
-      document.getElementById('nextPage').addEventListener('click', () => {
-        if (currentPage < Math.ceil(totalFixtures / pageSize)) {
-          currentPage++;
-          renderFixtures();
-        }
-      });
-      
-      // 全选控制
-      document.getElementById('selectAll').addEventListener('change', (event) => {
-        const isChecked = event.target.checked;
-        const checkboxes = document.querySelectorAll('#fixtureTableBody input[type="checkbox"]');
-        
-        checkboxes.forEach(checkbox => {
-          checkbox.checked = isChecked;
-          const fixtureId = checkbox.getAttribute('data-id');
-          if (fixtureId) {
-            if (isChecked && !selectedFixtures.includes(fixtureId)) {
-              selectedFixtures.push(fixtureId);
-            } else if (!isChecked && selectedFixtures.includes(fixtureId)) {
-              selectedFixtures = selectedFixtures.filter(id => id !== fixtureId);
-            }
-          }
-        });
-      });
-      
-      // 批量导出
-      document.getElementById('batchExportBtn').addEventListener('click', () => {
-        if (selectedFixtures.length === 0) {
-          showToast('请先选择要导出的治具', 'warning');
-          return;
-        }
-        
-        const exportData = fixtures.filter(fixture => selectedFixtures.includes(fixture.id));
-        downloadJSON(exportData, '治具数据导出.json');
-        showToast(`成功导出 ${selectedFixtures.length} 条治具数据`, 'success');
-      });
-    }
-    
-    // 加载治具数据
-    function loadFixtures() {
-      // 模拟从服务器加载数据
-      setTimeout(() => {
-        // 生成模拟数据
-        fixtures = generateMockFixtures(35);
-        totalFixtures = fixtures.length;
-        renderFixtures();
-      }, 800);
-    }
-    
-    // 生成模拟数据
-    function generateMockFixtures(count) {
-      const types = ['注塑机', '冲压机', '模具', '检具'];
-      const fixtures = [];
-      
-      for (let i = 1; i <= count; i++) {
-        const capacity = Math.floor(Math.random() * 30000) + 1000;
-        const scheduled = Math.floor(Math.random() * capacity) + 1;
-        const utilization = Math.round((scheduled / capacity) * 100);
-        
-        fixtures.push({
-          id: `J-${i.toString().padStart(5, '0')}`,
-          code: `J-${i.toString().padStart(5, '0')}`,
-          type: types[Math.floor(Math.random() * types.length)],
-          capacity,
-          scheduled,
-          utilization,
-          status: utilization < 70 ? 'normal' : (utilization < 90 ? 'warning' : 'over'),
-          lastUpdate: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10),
-          description: `这是一个${types[Math.floor(Math.random() * types.length)]}，编号为${i}`
-        });
-      }
-      
-      return fixtures;
-    }
-    
-    // 渲染治具表格
-    function renderFixtures() {
-      const tableBody = document.getElementById('fixtureTableBody');
-      const filteredFixtures = filterFixtures();
-      const startIndex = (currentPage - 1) * pageSize;
-      const endIndex = Math.min(startIndex + pageSize, filteredFixtures.length);
-      const paginatedFixtures = filteredFixtures.slice(startIndex, endIndex);
-      
-      // 更新显示范围和总数
-      document.getElementById('showingRange').textContent = `${startIndex + 1}-${endIndex}`;
-      document.getElementById('totalCount').textContent = filteredFixtures.length;
-      
-      // 更新分页按钮状态
-      document.getElementById('prevPage').disabled = currentPage === 1;
-      document.getElementById('nextPage').disabled = endIndex >= filteredFixtures.length;
-      
-      // 清空表格
-      tableBody.innerHTML = '';
-      
-      if (paginatedFixtures.length === 0) {
-        tableBody.innerHTML = `
-          <tr class="text-center">
-            <td colspan="9" class="px-6 py-10 text-gray-500">
-              <i class="fa fa-search text-xl mb-2"></i>
-              <p>没有找到匹配的治具数据</p>
-            </td>
-          </tr>
-        `;
-        return;
-      }
-      
-      // 填充表格数据
-      paginatedFixtures.forEach(fixture => {
-        const row = document.createElement('tr');
-        row.className = 'hover:bg-gray-50 transition-colors';
-        
-        // 根据状态设置不同的背景色
-        if (fixture.status === 'warning') {
-          row.classList.add('bg-yellow-50');
-        } else if (fixture.status === 'over') {
-          row.classList.add('bg-red-50');
-        }
-        
-        row.innerHTML = `
-          <td class="px-6 py-4 whitespace-nowrap">
-            <input type="checkbox" data-id="${fixture.id}" class="h-4 w-4 text-primary focus:ring-primary/30 border-gray-300 rounded" ${selectedFixtures.includes(fixture.id) ? 'checked' : ''}>
-          </td>
-          <td class="px-6 py-4 whitespace-nowrap">
-            <div class="font-medium text-gray-900">${fixture.code}</div>
-          </td>
-          <td class="px-6 py-4 whitespace-nowrap">
-            <div class="text-sm text-gray-900">${fixture.type}</div>
-          </td>
-          <td class="px-6 py-4 whitespace-nowrap">
-            <div class="text-sm text-gray-900">${fixture.capacity.toLocaleString()}</div>
-          </td>
-          <td class="px-6 py-4 whitespace-nowrap">
-            <div class="text-sm text-gray-900">${fixture.scheduled.toLocaleString()}</div>
-          </td>
-          <td class="px-6 py-4 whitespace-nowrap">
-            <div class="flex items-center">
-              <div class="w-full bg-gray-200 rounded-full h-2 mr-2">
-                <div class="bg-primary h-2 rounded-full" style="width: ${fixture.utilization}%"></div>
-              </div>
-              <span class="text-sm font-medium text-gray-900">${fixture.utilization}%</span>
-            </div>
-          </td>
-          <td class="px-6 py-4 whitespace-nowrap">
-            ${getStatusBadge(fixture.status)}
-          </td>
-          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-            ${fixture.lastUpdate}
-          </td>
-          <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-            <button data-id="${fixture.id}" class="edit-btn text-primary hover:text-primary/80 mr-3">
-              <i class="fa fa-pencil"></i> 编辑
-            </button>
-            <button data-id="${fixture.id}" class="delete-btn text-red-600 hover:text-red-900">
-              <i class="fa fa-trash"></i> 删除
-            </button>
-          </td>
-        `;
-        
-        tableBody.appendChild(row);
-      });
-      
-      // 添加编辑和删除按钮事件
-      document.querySelectorAll('.edit-btn').forEach(btn => {
-        btn.addEventListener('click', (event) => {
-          const fixtureId = event.currentTarget.getAttribute('data-id');
-          editFixture(fixtureId);
-        });
-      });
-      
-      document.querySelectorAll('.delete-btn').forEach(btn => {
-        btn.addEventListener('click', (event) => {
-          const fixtureId = event.currentTarget.getAttribute('data-id');
-          deleteFixture(fixtureId);
-        });
-      });
-      
-      // 添加复选框事件
-      document.querySelectorAll('#fixtureTableBody input[type="checkbox"]').forEach(checkbox => {
-        checkbox.addEventListener('change', (event) => {
-          const fixtureId = event.currentTarget.getAttribute('data-id');
-          if (event.currentTarget.checked) {
-            if (!selectedFixtures.includes(fixtureId)) {
-              selectedFixtures.push(fixtureId);
-            }
-          } else {
-            selectedFixtures = selectedFixtures.filter(id => id !== fixtureId);
-          }
-        });
-      });
-    }
-    
-    // 获取状态徽章HTML
-    function getStatusBadge(status) {
-      switch (status) {
-        case 'normal':
-          return `<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">正常</span>`;
-        case 'warning':
-          return `<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">接近超量</span>`;
-        case 'over':
-          return `<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">超量</span>`;
-        default:
-          return `<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">未知</span>`;
-      }
-    }
-    
-    // 编辑治具
-    function editFixture(id) {
-      const fixture = fixtures.find(fixture => fixture.id === id);
-      if (fixture) {
-        isEditing = true;
-        currentFixtureId = id;
-        
-        document.getElementById('fixtureFormTitle').textContent = '编辑治具';
-        document.getElementById('submitFixtureBtn').textContent = '保存更改';
-        
-        document.getElementById('fixtureCode').value = fixture.code;
-        document.getElementById('fixtureType').value = fixture.type;
-        document.getElementById('fixtureCapacity').value = fixture.capacity;
-        document.getElementById('fixtureScheduled').value = fixture.scheduled;
-        document.getElementById('fixtureDescription').value = fixture.description;
-        
-        hideErrorMessages();
-        document.getElementById('fixtureModal').classList.remove('hidden');
-      }
-    }
-    
-    // 删除治具
-    function deleteFixture(id) {
-      if (confirm('确定要删除这个治具吗？此操作不可撤销。')) {
-        fixtures = fixtures.filter(fixture => fixture.id !== id);
-        selectedFixtures = selectedFixtures.filter(selectedId => selectedId !== id);
-        renderFixtures();
-        showToast('治具已删除', 'success');
-      }
-    }
-    
-    // 表单验证
-    function validateForm() {
-      let isValid = true;
-      hideErrorMessages();
-      
-      const code = document.getElementById('fixtureCode').value.trim();
-      const type = document.getElementById('fixtureType').value;
-      const capacity = document.getElementById('fixtureCapacity').value;
-      const scheduled = document.getElementById('fixtureScheduled').value;
-      
-      if (!code) {
-        showError('codeError', '请输入治具编号');
-        isValid = false;
-      } else if (!/^J-\d{5}$/.test(code)) {
-        showError('codeError', '治具编号格式不正确，应为J-XXXXX形式');
-        isValid = false;
-      } else if (!isEditing && fixtures.some(fixture => fixture.code === code)) {
-        showError('codeError', '该治具编号已存在');
-        isValid = false;
-      }
-      
-      if (!type) {
-        showError('typeError', '请选择治具类型');
-        isValid = false;
-      }
-      
-      if (!capacity || isNaN(parseInt(capacity)) || parseInt(capacity) <= 0) {
-        showError('capacityError', '请输入有效的固定产能值');
-        isValid = false;
-      }
-      
-      if (!scheduled || isNaN(parseInt(scheduled)) || parseInt(scheduled) < 0) {
-        showError('scheduledError', '请输入有效的当前排程值');
-        isValid = false;
-      } else if (parseInt(scheduled) > parseInt(capacity)) {
-        showError('scheduledError', '当前排程不能大于固定产能');
-        isValid = false;
-      }
-      
-      return isValid;
-    }
-    
-    // 显示错误信息
-    function showError(elementId, message) {
-      const errorElement = document.getElementById(elementId);
-      if (errorElement) {
-        errorElement.textContent = message;
-        errorElement.classList.remove('hidden');
-      }
-    }
-    
-    // 隐藏所有错误信息
-    function hideErrorMessages() {
-      document.querySelectorAll('.error-message').forEach(element => {
-        element.classList.add('hidden');
-      });
-    }
-    
-    // 筛选治具
-    function filterFixtures() {
-      const typeFilter = document.getElementById('typeFilter').value;
-      const statusFilter = document.getElementById('statusFilter').value;
-      const capacityFilter = document.getElementById('capacityFilter').value;
-      const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
-      
-      let filtered = [...fixtures];
-      
-      if (typeFilter) {
-        filtered = filtered.filter(fixture => fixture.type === typeFilter);
-      }
-      
-      if (statusFilter) {
-        filtered = filtered.filter(fixture => fixture.status === statusFilter);
-      }
-      
-      if (capacityFilter) {
-        const [min, max] = capacityFilter.split('-');
-        
-        if (max) {
-          // 范围查询
-          filtered = filtered.filter(fixture => 
-            fixture.capacity >= parseInt(min) && fixture.capacity <= parseInt(max)
-          );
-        } else if (capacityFilter.endsWith('+')) {
-          // 大于查询
-          const minValue = parseInt(capacityFilter.replace('+', ''));
-          filtered = filtered.filter(fixture => fixture.capacity >= minValue);
-        }
-      }
-      
-      if (searchTerm) {
-        filtered = filtered.filter(fixture => 
-          fixture.code.toLowerCase().includes(searchTerm) || 
-          fixture.type.toLowerCase().includes(searchTerm)
-        );
-      }
-      
-      // 重置页码
-      if (currentPage > Math.ceil(filtered.length / pageSize)) {
-        currentPage = Math.max(1, Math.ceil(filtered.length / pageSize));
-      }
-      
-      renderFixtures();
-      return filtered;
-    }
-    
-    // 重置筛选器
-    function resetFilters() {
-      document.getElementById('typeFilter').value = '';
-      document.getElementById('statusFilter').value = '';
-      document.getElementById('capacityFilter').value = '';
-      document.getElementById('searchInput').value = '';
-      
-      currentPage = 1;
-      filterFixtures();
-    }
-    
-    // 批量导入确认
-    function confirmBatchImport() {
-      if (!importData || !Array.isArray(importData) || importData.length === 0) {
-        showToast('没有可导入的数据', 'error');
-        return;
-      }
-      
-      document.getElementById('batchImportConfirm').classList.add('hidden');
-      document.getElementById('batchImportLoading').classList.remove('hidden');
-      
-      // 模拟导入过程
-      setTimeout(() => {
+  <script src="jig-management.js"></script>
+</body>
+</html>
