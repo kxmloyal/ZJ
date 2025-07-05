@@ -5,7 +5,7 @@ const morgan = require('morgan');
 const path = require('path');
 const config = require('./config/db.config');
 const routes = require('./routes');
-const NodeCache = require('node - cache');
+const NodeCache = require('node-cache'); // 正确：模块名是 node-cache
 const myCache = new NodeCache();
 
 // 初始化Express应用

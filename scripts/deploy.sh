@@ -7,6 +7,9 @@ echo "开始部署治具产能监控系统..."
 LOG_FILE="deployment.log"
 exec > >(tee -a $LOG_FILE) 2>&1
 
+# 显示当前工作目录
+echo "当前工作目录: $(pwd)"
+
 # 检查Node.js版本
 NODE_VERSION=$(node -v 2>/dev/null)
 if [ $? -ne 0 ]; then
@@ -35,7 +38,8 @@ echo "项目构建完成。"
 
 # 启动数据库迁移
 echo "开始数据库迁移..."
-node ZJ/scripts/db-migrate.js
+# 修改为正确的相对路径
+node scripts/db-migrate.js
 if [ $? -ne 0 ]; then
     echo "错误：数据库迁移失败，请检查数据库配置。"
     exit 1
@@ -56,7 +60,7 @@ if [ "$1" = "--prod" ]; then
         echo "PM2安装完成。"
     fi
     
-    pm2 start ZJ/server/server.js --name jig-monitoring
+    pm2 start server/server.js --name jig-monitoring
     if [ $? -ne 0 ]; then
         echo "错误：使用PM2启动应用失败，请检查应用配置。"
         exit 1
