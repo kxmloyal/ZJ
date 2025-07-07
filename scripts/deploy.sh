@@ -36,15 +36,30 @@ if [ $? -ne 0 ]; then
 fi
 echo "项目构建完成。"
 
-# 启动数据库迁移
-echo "开始数据库迁移..."
-# 修改为正确的相对路径
-node scripts/db-migrate.js
-if [ $? -ne 0 ]; then
-    echo "错误：数据库迁移失败，请检查数据库配置。"
-    exit 1
+# 加载环境变量
+if [ -f .env ]; then
+    echo "加载环境变量..."
+    source .env
+else
+    echo "警告：未找到.env文件，使用默认环境变量。"
 fi
-echo "数据库迁移完成。"
+
+# 检查数据库类型
+DB_TYPE=${DB_TYPE:-json}
+echo "数据库类型: $DB_TYPE"
+
+# 启动数据库迁移
+if [ "$DB_TYPE" = "mysql" ]; then
+    echo "开始数据库迁移..."
+    node scripts/db-migrate.js
+    if [ $? -ne 0 ]; then
+        echo "错误：数据库迁移失败，请检查数据库配置。"
+        exit 1
+    fi
+    echo "数据库迁移完成。"
+else
+    echo "当前配置使用JSON存储，跳过数据库迁移。"
+fi
 
 # 启动应用
 echo "准备启动应用..."
@@ -74,6 +89,23 @@ if [ "$1" = "--prod" ]; then
         exit 1
     fi
     echo "PM2进程列表已保存。"
+elif [ "$1" = "--docker" ]; then
+    # Docker部署
+    if ! command -v docker &> /dev/null; then
+        echo "错误：未找到Docker，请先安装Docker。"
+        exit 1
+    fi
+    if ! command -v docker-compose &> /dev/null; then
+        echo "错误：未找到Docker Compose，请先安装Docker Compose。"
+        exit 1
+    fi
+    echo "正在使用Docker Compose启动应用..."
+    docker-compose up -d
+    if [ $? -ne 0 ]; then
+        echo "错误：使用Docker Compose启动应用失败，请检查Docker配置。"
+        exit 1
+    fi
+    echo "应用已使用Docker Compose启动。"
 else
     # 开发环境使用nodemon
     if ! command -v nodemon &> /dev/null; then
@@ -95,4 +127,4 @@ else
 fi
 
 echo "部署完成！"
-echo "应用已启动，访问 http://localhost:3000"
+echo "应用已启动，访问 http://localhost:${PORT:-3000}"

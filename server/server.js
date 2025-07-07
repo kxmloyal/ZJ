@@ -1,3 +1,4 @@
+// ZJ/server/server.js
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
@@ -5,8 +6,10 @@ const morgan = require('morgan');
 const path = require('path');
 const config = require('./config/db.config');
 const routes = require('./routes');
-const NodeCache = require('node-cache'); // 正确：模块名是 node-cache
+const NodeCache = require('node-cache');
 const myCache = new NodeCache();
+// 新增引入 FixtureModel
+const { FixtureModel } = require('./models'); 
 
 // 初始化Express应用
 const app = express();

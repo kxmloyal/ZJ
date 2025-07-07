@@ -4,52 +4,19 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>治具产能监控系统 - 治具管理</title>
+  
+  <!-- 引入外部资源 -->
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
   
   <!-- Tailwind 配置 -->
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            primary: '#165DFF',
-            success: '#00B42A',
-            warning: '#FF7D00',
-            danger: '#F53F3F',
-            dark: '#1D2129',
-          },
-          fontFamily: {
-            inter: ['Inter', 'system-ui', 'sans-serif'],
-          },
-        },
-      }
-    }
-  </script>
+  <script src="common.js"></script>
   
-  <style type="text/tailwindcss">
-    @layer utilities {
-      .content-auto {
-        content-visibility: auto;
-      }
-      .scrollbar-hide {
-        -ms-overflow-style: none;
-        scrollbar-width: none;
-      }
-      .scrollbar-hide::-webkit-scrollbar {
-        display: none;
-      }
-      .card-hover {
-        transition: transform 0.3s, box-shadow 0.3s;
-      }
-      .card-hover:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-      }
-    }
-  </style>
+  <!-- 自定义样式 -->
+  <link rel="stylesheet" href="common.css">
 </head>
 <body class="font-inter bg-gray-50 text-dark min-h-screen flex flex-col">
+  
   <!-- 侧边栏导航 -->
   <div class="fixed inset-y-0 left-0 z-40 w-64 bg-white shadow-md transform transition-transform duration-300 ease-in-out md:translate-x-0 -translate-x-full" id="sidebar">
     <div class="flex h-16 items-center justify-between border-b border-gray-200 px-4">

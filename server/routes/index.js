@@ -2,7 +2,8 @@
 const express = require('express');
 const router = express.Router();
 const fixtureController = require('../controllers/fixture.controller');
-const settingsController = require('../settings.controller');
+// 修改引入路径
+const settingsController = require('../controllers/settings.controller'); 
 
 // 治具相关路由
 router.get('/api/fixtures', fixtureController.getAllFixtures);
